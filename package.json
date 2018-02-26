@@ -1,0 +1,24 @@
+{
+  "name": "bcoin-scripting",
+  "version": "1.0.0",
+  "description": "Hacking on bitcoin transactions with [bcoin](https://github.com/bcoin-org/bcoin)",
+  "main": "basic-txn.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tynes/bcoin-scripting.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tynes/bcoin-scripting/issues"
+  },
+  "homepage": "https://github.com/tynes/bcoin-scripting#readme",
+  "dependencies": {
+    "bcoin": "^1.0.0-beta.15",
+    "commander": "^2.14.1"
+  }
+}
