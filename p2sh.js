@@ -99,7 +99,7 @@ const main = async (args, logger) => {
   const client = new Client({ network: args.network })
   const rawCoins = await client.getCoinsByAddress(recipientAddress.toString())
   const coins = rawCoins.map(c => Coin.fromJSON(c))
-  
+
   const sendValue = parseValue(args.sendValue)
 
   // calculate smartfee based on user input
@@ -144,16 +144,17 @@ const main = async (args, logger) => {
 }
 
 // script starting point
-const args = parseArgs()
-const logger = getLogger(path.basename(__filename))
-validateArgs(args)
-main(args, logger)
-  .catch(err => {
-    logger.error(err)
-    process.exit(1)
-  })
+if (require.main) {
+  const args = parseArgs()
+  const logger = getLogger(path.basename(__filename))
+  validateArgs(args)
+  main(args, logger)
+    .catch(err => {
+      logger.error(err)
+      process.exit(1)
+    })
+}
 
-// TODO - refactor into module instead of script
 module.exports = {
-  main
+  createp2sh: main,
 }

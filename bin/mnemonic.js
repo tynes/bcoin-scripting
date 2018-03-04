@@ -32,13 +32,22 @@ const main = (args) => {
     language: 'english',
   })
   if (args.echo) {
-    process.stdout.write(mnemonic.toString())
+    return mnemonic.toString()
   } else {
     const outputPath = args.outputPath
     fs.writeFileSync(outputPath, mnemonic.toString())
   }
 }
 
-const args = parseArgs()
-main(args)
+if (require.main) {
+  const args = parseArgs()
+  const mnemonic = main(args)
+  // only write to stdout if there is something to write
+  if (mnemonic) {
+    process.stdout.write(mnemonic)
+  }
+}
 
+module.exports = {
+  createMnemonic: main,
+}

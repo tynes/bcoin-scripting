@@ -6,6 +6,7 @@ const fs = require('fs');
 const assert = require('assert');
 const bcoin = require('bcoin');
 const { RPCClient } = bcoin.http;
+const { parseInt } = require('./commanderUtilities')
 
 /*
  * This script generates a timestamp that can be used
@@ -15,8 +16,6 @@ const { RPCClient } = bcoin.http;
  * The -t must be a ISO 8601 compliant string including the time zone,
  * example: '25 Feb 2018 13:50:00 MST'
  */
-
-const parseInt = val => +val
 
 // THERE IS DEFINITELY SOMETHING WRONG HERE
 const parseArgs = () => {
@@ -73,16 +72,28 @@ const main = async (args) => {
   }
 
   if (args.echo) {
-    process.stdout.write(result.toString())
+    return result.toString()
   } else {
     fs.writeFileSync(args.outputPath, result)
   }
 }
 
-const args = parseArgs()
-validateArgs(args)
-main(args)
-  .catch(err => {
-    console.log(err)
-    process.exit(1)
-  })
+if (require.main) {
+  const args = parseArgs()
+  validateArgs(args)
+  main(args)
+    .then(result => {
+      // only write to stdout if there is something to write
+      if (result) {
+        process.stdout.write(result)
+      }
+    })
+    .catch(err => {
+      console.log(err)
+      process.exit(1)
+    })
+}
+
+module.exports = {
+  getTimelockValue: main,
+}

@@ -44,9 +44,17 @@ const main = (args) => {
   return paths
 }
 
-const args = parseArgs()
-const result = main(args)
-for (let i = 0; i < result.length; i++) {
-  process.stdout.write(`${result[i]}\n`)
+
+// like in python, allows to be ran as a script or module
+if (require.main) {
+  const args = parseArgs()
+  const result = main(args)
+  for (let i = 0; i < result.length; i++) {
+    process.stdout.write(`${result[i]}\n`)
+  }
+}
+
+module.exports = {
+  getAddresses: main
 }
 
