@@ -19,6 +19,7 @@
   "homepage": "https://github.com/tynes/bcoin-scripting#readme",
   "dependencies": {
     "bcoin": "^1.0.0-beta.15",
+    "bunyan": "^1.8.12",
     "commander": "^2.14.1"
   }
 }

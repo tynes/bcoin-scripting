@@ -18,6 +18,7 @@ const { RPCClient } = bcoin.http;
 
 const parseInt = val => +val
 
+// THERE IS DEFINITELY SOMETHING WRONG HERE
 const parseArgs = () => {
   return program
     .version('0.0.1')

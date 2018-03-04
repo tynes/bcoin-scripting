@@ -1,7 +1,10 @@
+// TODO - this shouldn't always be testnet
 const bcoin = require('bcoin').set('testnet');
 const fs = require('fs');
+const path = require('path');
 const assert = require('assert');
 
+// bcoin helpers
 const Mnemonic = bcoin.hd.Mnemonic;
 const Keyring = bcoin.keyring;
 const opcodes = bcoin.script.opcodes;
@@ -11,6 +14,11 @@ const Script = bcoin.script;
 const crypto = bcoin.crypto;
 const base58 = bcoin.utils.base58;
 const Address = bcoin.address;
+const Amount = bcoin.amount;
+
+// create a globally scoped logger for this module
+const { getLogger } = require('./logger')
+const logger = getLogger(path.basename(__filename))
 
 // hash is the pubkeyhash of the recipient
 const buildCLTVScript = (lockUntil, hash) => {
@@ -27,6 +35,7 @@ const buildCLTVScript = (lockUntil, hash) => {
   return Script.fromArray(script)
 }
 
+// TODO - debug this
 const buildp2shAddress = (hash) => {
   const versionedRawScript = Buffer.concat([Buffer.from('05', 'hex'), hash])
   const rawScriptChecksum = crypto.sha256(crypto.sha256(versionedRawScript)).toString('hex').slice(0,8)
@@ -42,15 +51,27 @@ const getKeyring = (mnemonic, derivedPath) => {
   return new Keyring(derived)
 }
 
+// try to read file, otherwise it is assumed to be a literal mnemonic passed in
 const getMnemonic = pathOrLiteral => {
   try {
     const literal = fs.readFileSync(pathOrLiteral).toString()
     return new Mnemonic(literal)
   } catch (e) {
     // no file found, it must be a literal
-
     return new Mnemonic(pathOrLiteral)
   };
+}
+
+// assumes that if value contains a '.', then the value is
+// in BTC, otherwise it is in satoshis
+const parseValue = value => {
+  assert.equal(typeof value, 'number')
+  if (value.toString().includes('.')) {
+    // assume btc value
+    return Amount.fromBTC(value).value
+  } 
+  // assume satoshi value
+  return Amount.fromSatoshis(value).value
 }
 
 class HDWalletPath {
@@ -83,9 +104,8 @@ class HDWalletPath {
       value: addressIndex,
       hardened: this.isHardened(addressIndex)
     }
-
-  
   }
+
   isHardened(index) {
     return index.slice(-1) == "'"
   }
@@ -118,4 +138,5 @@ module.exports = {
   getKeyring,
   getMnemonic,
   HDWalletPath,
+  parseValue,
 };

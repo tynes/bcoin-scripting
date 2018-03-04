@@ -25,7 +25,7 @@ const main = (args) => {
   if (numberOfKeys > 1) {
     let path = args.derivedPath
     let wallet;
-    // ugh state is the worst
+    // ugh this state is the worst
     for (let i = 0; i < numberOfKeys; i++) {
       wallet = new HDWalletPath(path)
       path = wallet.getPath()
