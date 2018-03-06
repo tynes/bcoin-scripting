@@ -17,13 +17,14 @@ const Address = bcoin.address;
 const Mnemonic = bcoin.hd.Mnemonic;
 const HD = bcoin.hd;
 // debug
+// TODO - delete unused modules
 const base58 = bcoin.utils.base58;
 const Input = bcoin.input;
 const Outpoint = bcoin.outpoint;
 const TX = bcoin.tx;
 const Coinview = bcoin.coinview;
 const { Client, Wallet, RPCClient } = bcoin.http;
-const { buildCLTVScript, buildp2shAddress, getKeyring, getMnemonic, parseValue } = require('./bin/utilities')
+const { buildCLTVScript, buildp2shAddress, getKeyring, getMnemonic, parseValue, getSmartFee } = require('./bin/utilities')
 const { parseInt } = require('./bin/commanderUtilities')
 const { getLogger } = require('./bin/logger')
 
@@ -44,9 +45,9 @@ const parseArgs = () => {
     .option('-r, --recipient <address>', 'address to send funds to')
     .option('-a, --change-address <address>', 'address to send change to')
     .option('-s, --redeem-script-path <path>', 'path to a file write the redeem script to')
+    .option('-y, --p2sh-address-path <path>', 'path to a file write the p2sh address to')
     .option('-q, --locking-script-path <path>', 'path to a file to write the locking script to')
     .option('-x, --txn-hash-path <path>', 'path to a file to write the tranaction hash to')
-    .option('-w, --bcoin-wallet-id <id>', 'bcoin wallet id for http wallet')
     .option('-v, --send-value <value>', 'amount of value to send in satoshis or bitcoin', parseInt)
     .option('-f, --smart-fee-blocks <blocks>', 'estimate fee based on inclusion in the next number of blocks', parseInt)
     .option('-d, --dry-run', 'dry run')
@@ -91,6 +92,7 @@ const main = async (args, logger) => {
 
   // create p2sh address
   const p2sh = Address.fromScripthash(hashedRawScript, args.network)
+  fs.writeFileSync(args.p2shAddressPath, p2sh.toString())
 
   // create locking script
   const lockscript = Script.fromScripthash(hashedRawScript, args.network);
@@ -103,10 +105,14 @@ const main = async (args, logger) => {
   const sendValue = parseValue(args.sendValue)
 
   // calculate smartfee based on user input
-  const rawSmartFee = await rpc.execute('estimatesmartfee', [args.smartFeeBlocks])
-  const smartFee = Amount.fromBTC(rawSmartFee.fee).value 
+  // TODO - make sure this refactor works
+  // const rawSmartFee = await rpc.execute('estimatesmartfee', [args.smartFeeBlocks])
+  // const smartFee = Amount.fromBTC(rawSmartFee.fee).value
+  const smartFee = await getSmartFee(rpc, args.smartFeeBlocks)
   logger.info(`Using smart fee ${smartFee}`)
 
+
+  // TODO - set locktime
   const spend = new MTX();
   spend.addOutput({
     address: p2sh,

@@ -3,17 +3,28 @@ Hacking on bitcoin transactions with [bcoin](https://github.com/bcoin-org/bcoin)
 
 NOTE: This is a work in progress and not intended to be used on mainnet
 
-Make sure to have `bcoin` installed
-These scripts currently are hardcoded against the testnet, be sure to sync the testnet first with:
+To start the `testnet`, run `./start.sh`
 
-```
-bcoin --network testnet --http-port 18332 --no-auth
-```
-If you want to specify a different directory to store the blockchain data besides `~/.bcoin`, provide a `prefix`
-parameter. I use:
+Make sure that the `testnet` is fully synced, because these scripts depend on that
 
+In progress dev create p2sh script:
+```bash
+source utils/create_env.sh && node p2sh.js \
+    -m $MNEMONIC_PATH -p $HD_PATH \
+    -n $NETWORK -l $CLTV -c $N_LOCKTIME \
+    -r $FIRST_ADDRESS -s $REDEEM_SCRIPT_PATH \
+    -q $LOCKING_SCRIPT_PATH -v $TXN_VALUE \
+    -f $SMART_FEE_BLOCKS -a $FIRST_ADDRESS \
+    -x $TXN_HASH_PATH -y $P2SH_ADDRESS_PATH -d
 ```
-./bin/bcoin --prefix ~/.bcoin-test --network testnet --http-port 18332 --no-auth
+
+In progress dev spend p2sh script:
+```bash
+source utils/spend_env.sh && node --inspect-brk spend.js \
+    -m $MNEMONIC_PATH -p $HD_PATH \
+    -n $NETWORK -s $REDEEM_SCRIPT_PATH \
+    -q $LOCKING_SCRIPT_PATH -x $TXN_HASH_PATH \
+    -y $P2SH_ADDRESS_PATH -r $FIRST_ADDRESS -d
 ```
 
 NOTE: Use auth on mainnet
