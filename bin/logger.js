@@ -6,7 +6,6 @@ const getLogger = (module, logLevel = 'info') => {
     level: logLevel,
   })
 
-  logger.fields.log_level = logLevel
   delete logger.fields.pid
   delete logger.fields.hostname
   return logger
